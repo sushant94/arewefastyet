@@ -72,11 +72,11 @@ class Submitter:
             url = self.urls[i] + '?' + urllib.urlencode(args)
             urllib2.urlopen(url)
 
-    def AddTests(self, tests, suite, suiteversion, mode):
+    def AddTests(self, tests, suite, suiteversion, mode, description):
         for test in tests:
-            self.SubmitTest(test['name'], suite, suiteversion, mode, test['time'])
+            self.SubmitTest(test['name'], suite, suiteversion, mode, test['time'], description)
 
-    def SubmitTest(self, name, suite, suiteversion, mode, time):
+    def SubmitTest(self, name, suite, suiteversion, mode, time, description):
         for i in range(len(self.urls)):
             if not self.runIds[i]:
                 continue
@@ -86,7 +86,8 @@ class Submitter:
                      'suite': suite,
                      'version': suiteversion,
                      'mode': mode,
-                     'time': str(time)
+                     'time': str(time),
+                     'description': description
                    }
             url = self.urls[i] + '?' + urllib.urlencode(args)
             urllib2.urlopen(url)

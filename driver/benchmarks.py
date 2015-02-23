@@ -17,10 +17,11 @@ import submitter
 import utils
 
 class Benchmark(object):
-    def __init__(self, suite, version, folder):
+    def __init__(self, suite, version, folder, description):
         self.suite = suite
         self.version = suite+" "+version
         self.folder = folder
+        self.description = description
 
     def run(self, submit, native, modes):
         with utils.chdir(os.path.join(utils.config.BenchmarkPath, self.folder)):
@@ -43,11 +44,11 @@ class Benchmark(object):
                 print("Exception: " +  repr(e))
                 pass
             if tests:
-                submit.AddTests(tests, self.suite, self.version, mode.name)
+                submit.AddTests(tests, self.suite, self.version, mode.name, self.description)
 
 class AsmJS(Benchmark):
-    def __init__(self, suite, version, folder):
-        super(AsmJS, self).__init__(suite, version, folder)
+    def __init__(self, suite, version, folder, description):
+        super(AsmJS, self).__init__(suite, version, folder, description)
 
     def omit(self, mode):
         if mode.name == 'noasmjs':
@@ -63,7 +64,7 @@ class AsmJS(Benchmark):
         output = utils.RunTimedCheckOutput(full_args)
         
         tests = self.parse(output)
-        submit.AddTests(tests, self.suite, self.version, native.mode)
+        submit.AddTests(tests, self.suite, self.version, native.mode, self.description)
 
         # Run normal benchmarks.
         super(AsmJS, self)._run(submit, native, modes)
@@ -91,15 +92,15 @@ class AsmJS(Benchmark):
 
 class AsmJSMicro(AsmJS):
     def __init__(self):
-        super(AsmJSMicro, self).__init__('asmjs-ubench', '0.4', 'asmjs-ubench')
+        super(AsmJSMicro, self).__init__('asmjs-ubench', '0.4', 'asmjs-ubench', 'asmjs-ubench')
 
 class AsmJSApps(AsmJS):
     def __init__(self):
-        super(AsmJSApps, self).__init__('asmjs-apps', '0.2', 'asmjs-apps')
+        super(AsmJSApps, self).__init__('asmjs-apps', '0.2', 'asmjs-apps', 'asmjs-apps')
 
 class Octane(Benchmark):
     def __init__(self):
-        super(Octane, self).__init__('octane', '2.0.1', 'octane')
+        super(Octane, self).__init__('octane', '2.0.1', 'octane', 'octane')
 
     def benchmark(self, shell, env, args):
         full_args = [shell]
@@ -127,8 +128,8 @@ class Octane(Benchmark):
         return tests
 
 class SunSpiderBased(Benchmark):
-    def __init__(self, suite, version, folder, runs):
-        super(SunSpiderBased, self).__init__(suite, version, folder)
+    def __init__(self, suite, version, folder, description, runs):
+        super(SunSpiderBased, self).__init__(suite, version, folder, description)
         self.runs = runs
 
     def benchmark(self, shell, env, args):
@@ -168,19 +169,19 @@ class SunSpiderBased(Benchmark):
 
 class SunSpider(SunSpiderBased):
     def __init__(self):
-        super(SunSpider, self).__init__('ss', '1.0.1', 'SunSpider', 20)
+        super(SunSpider, self).__init__('ss', '1.0.1', 'SunSpider', 'SunSpider', 20)
 
 class Kraken(SunSpiderBased):
     def __init__(self):
-        super(Kraken, self).__init__('kraken', '1.1', 'kraken', 5)
+        super(Kraken, self).__init__('kraken', '1.1', 'kraken', 'kraken', 5)
 
 class Assorted(SunSpiderBased):
     def __init__(self):
-        super(Assorted, self).__init__('misc', '0.1', 'misc', 3)
+        super(Assorted, self).__init__('misc', '0.1', 'misc', 'misc', 3)
 
 class Shumway(Benchmark):
     def __init__(self):
-        super(Shumway, self).__init__('shumway', '0.1', 'shumway')
+        super(Shumway, self).__init__('shumway', '0.1', 'shumway', 'shumway')
 
         # Only update harness once a day:
         from datetime import datetime
